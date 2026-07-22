@@ -23,8 +23,12 @@ Available tools:
 
 ## JavaScript client
 
+```bash
+npm install deploytoagents
+```
+
 ```js
-import { DeployToAgentsClient } from "deploytoagents-sdk";
+import { DeployToAgentsClient } from "deploytoagents";
 
 const client = new DeployToAgentsClient();
 
@@ -41,7 +45,19 @@ try {
 }
 ```
 
-The npm package name is reserved in this source but has not yet been published. Clone the repository and use the source directly until the first package release is announced.
+## Python client
+
+```bash
+pip install deploytoagents
+```
+
+```python
+from deploytoagents import DeployToAgentsClient
+
+async with DeployToAgentsClient() as client:
+    queued = await client.audit_app("https://example.com")
+    print(queued["receipt_url"])
+```
 
 ## Customer Zero
 

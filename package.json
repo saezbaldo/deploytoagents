@@ -1,6 +1,6 @@
 {
-  "name": "deploytoagents-sdk",
-  "version": "0.1.1",
+  "name": "deploytoagents",
+  "version": "0.2.0",
   "description": "Public JavaScript client for the Deploy to Agents remote MCP server.",
   "type": "module",
   "license": "MIT",
@@ -8,6 +8,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/saezbaldo/deploytoagents.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "exports": {
     ".": {
