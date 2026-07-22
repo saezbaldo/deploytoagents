@@ -83,7 +83,7 @@ function windowsProtect(value, decrypt = false) {
   const output = decrypt
     ? "[Text.Encoding]::UTF8.GetString($result)"
     : "[Convert]::ToBase64String($result)";
-  const script = `$text=[Console]::In.ReadToEnd();${input};$result=[Security.Cryptography.ProtectedData]::${operation}($bytes,$null,[Security.Cryptography.DataProtectionScope]::CurrentUser);${output}`;
+  const script = `Add-Type -AssemblyName System.Security;$text=[Console]::In.ReadToEnd();${input};$result=[Security.Cryptography.ProtectedData]::${operation}($bytes,$null,[Security.Cryptography.DataProtectionScope]::CurrentUser);${output}`;
   const result = spawnSync("powershell.exe", ["-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
     { input: value, encoding: "utf8", windowsHide: true, maxBuffer: 1024 * 1024 });
   if (result.status !== 0) throw new CliError("credential_store_failed", "Windows Credential Protection failed.");
@@ -146,6 +146,7 @@ async function refreshCredentials(credentials) {
     refresh_token: credentials.refreshToken,
     grant_type: "refresh_token",
   });
+  if (credentials.clientSecret) body.set("client_secret", credentials.clientSecret);
   const token = await fetchJson("https://oauth2.googleapis.com/token", {
     method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body,
   });
@@ -207,11 +208,12 @@ async function login(api) {
     client_id: config.cliClientId, code: authorization.code, code_verifier: authorization.verifier,
     redirect_uri: authorization.redirectUri, grant_type: "authorization_code",
   });
+  if (config.cliClientSecret) body.set("client_secret", config.cliClientSecret);
   const token = await fetchJson("https://oauth2.googleapis.com/token", {
     method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body,
   });
   if (!token.id_token || !token.refresh_token) throw new CliError("login_failed", "Google did not return the required login credentials.", 3);
-  const credentials = { clientId: config.cliClientId, refreshToken: token.refresh_token, idToken: token.id_token, createdAt: new Date().toISOString() };
+  const credentials = { clientId: config.cliClientId, clientSecret: config.cliClientSecret, refreshToken: token.refresh_token, idToken: token.id_token, createdAt: new Date().toISOString() };
   await saveCredentials(credentials);
   return whoami(api, credentials);
 }
