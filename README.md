@@ -2,6 +2,8 @@
 
 Public JavaScript client and registry metadata for the [Deploy to Agents](https://deploytoagents.com) remote MCP server.
 
+The remote server is published in the official MCP Registry as `com.deploytoagents/server` and is served from `https://deploytoagents.com/mcp`.
+
 Deploy to Agents currently audits public agent-facing surfaces, returns unlisted evidence receipts, and creates prioritized technical and external-authority distribution plans. It does **not** yet claim to publish every customer artifact or guarantee recommendation by any model.
 
 ## Connect directly through MCP

@@ -3,7 +3,7 @@
   "name": "com.deploytoagents/server",
   "title": "Deploy to Agents",
   "description": "Audit agent-distribution surfaces and create an evidence-based distribution plan.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "websiteUrl": "https://deploytoagents.com",
   "repository": {
     "url": "https://github.com/saezbaldo/deploytoagents",
