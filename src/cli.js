@@ -141,14 +141,9 @@ async function authConfig(api) {
 async function refreshCredentials(credentials) {
   if (credentials.environment || (credentials.idToken && tokenExpiry(credentials.idToken) > Date.now() / 1000 + 120)) return credentials;
   if (!credentials.refreshToken || !credentials.clientId) throw new CliError("session_expired", "Run `d2a login` again.", 3);
-  const body = new URLSearchParams({
-    client_id: credentials.clientId,
-    refresh_token: credentials.refreshToken,
-    grant_type: "refresh_token",
-  });
-  if (credentials.clientSecret) body.set("client_secret", credentials.clientSecret);
-  const token = await fetchJson("https://oauth2.googleapis.com/token", {
-    method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body,
+  const token = await fetchJson(`${credentials.api ?? DEFAULT_API}/api/auth/cli/token`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ grantType: "refresh_token", refreshToken: credentials.refreshToken }),
   });
   if (!token.id_token) throw new CliError("session_refresh_failed", "Google did not return an identity token.", 3);
   const updated = { ...credentials, idToken: token.id_token, refreshedAt: new Date().toISOString() };
@@ -204,16 +199,13 @@ async function login(api) {
   if (!config.enabled || !config.cliClientId)
     throw new CliError("login_not_configured", "CLI login is not enabled on this Deploy to Agents server yet.", 3);
   const authorization = await receiveAuthorizationCode(config.cliClientId);
-  const body = new URLSearchParams({
-    client_id: config.cliClientId, code: authorization.code, code_verifier: authorization.verifier,
-    redirect_uri: authorization.redirectUri, grant_type: "authorization_code",
-  });
-  if (config.cliClientSecret) body.set("client_secret", config.cliClientSecret);
-  const token = await fetchJson("https://oauth2.googleapis.com/token", {
-    method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body,
+  const token = await fetchJson(`${api}/api/auth/cli/token`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ grantType: "authorization_code", code: authorization.code,
+      codeVerifier: authorization.verifier, redirectUri: authorization.redirectUri }),
   });
   if (!token.id_token || !token.refresh_token) throw new CliError("login_failed", "Google did not return the required login credentials.", 3);
-  const credentials = { clientId: config.cliClientId, clientSecret: config.cliClientSecret, refreshToken: token.refresh_token, idToken: token.id_token, createdAt: new Date().toISOString() };
+  const credentials = { api, clientId: config.cliClientId, refreshToken: token.refresh_token, idToken: token.id_token, createdAt: new Date().toISOString() };
   await saveCredentials(credentials);
   return whoami(api, credentials);
 }
