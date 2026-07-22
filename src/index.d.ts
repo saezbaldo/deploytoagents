@@ -63,6 +63,11 @@ export class DeployToAgentsClient {
     technical_audit_score: number;
     receipt_url: string;
     claim: string;
+    externally_verified: Array<{
+      type: "official-mcp-registry" | "public-source-release" | "npm-package" | "pypi-package";
+      identifier: string;
+      url: string;
+    }>;
     independent_discovery_status: "not-yet-proven" | "observed";
     next_proof: string;
   }>;
