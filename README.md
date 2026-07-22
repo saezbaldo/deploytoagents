@@ -2,7 +2,18 @@
 
 Public JavaScript client and registry metadata for the [Deploy to Agents](https://deploytoagents.com) remote MCP server.
 
-The remote server is published in the official MCP Registry as `com.deploytoagents/server` and is served from `https://deploytoagents.com/mcp`. The client is published as `deploytoagents@0.2.1` on npm, with an equivalent `deploytoagents==0.1.1` client on PyPI.
+The remote server is published in the official MCP Registry as `com.deploytoagents/server` and is served from `https://deploytoagents.com/mcp`. The currently published client is `deploytoagents@0.2.1` on npm, with an equivalent `deploytoagents==0.1.1` client on PyPI. The next npm release adds the authenticated agent-first CLI described below.
+
+## Agent-first CLI
+
+```bash
+npx deploytoagents login
+npx deploytoagents whoami
+npx deploytoagents portfolio --json
+npx deploytoagents audit https://example.com --json
+```
+
+The package installs both `deploytoagents` and the shorter `d2a` command. Google login uses Authorization Code with PKCE and a temporary loopback callback. On Windows the refresh credential is encrypted for the current OS user with DPAPI; CI can provide a short-lived identity token through `DEPLOYTOAGENTS_TOKEN`. All command results and errors have stable JSON forms for agent use.
 
 Deploy to Agents currently audits public agent-facing surfaces, returns unlisted evidence receipts, and creates prioritized technical and external-authority distribution plans. It does **not** yet claim to publish every customer artifact or guarantee recommendation by any model.
 

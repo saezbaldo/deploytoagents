@@ -4,6 +4,7 @@ export type DeployToAgentsClientOptions = {
   endpoint?: string;
   clientName?: string;
   clientVersion?: string;
+  token?: string;
 };
 
 export type AuditFinding = {

@@ -1,7 +1,7 @@
 {
   "name": "deploytoagents",
-  "version": "0.2.1",
-  "description": "Public JavaScript client for the Deploy to Agents remote MCP server.",
+  "version": "0.3.0",
+  "description": "Agent-first CLI and JavaScript client for Deploy to Agents.",
   "type": "module",
   "license": "MIT",
   "homepage": "https://deploytoagents.com",
@@ -11,6 +11,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "bin": {
+    "deploytoagents": "./src/cli.js",
+    "d2a": "./src/cli.js"
   },
   "exports": {
     ".": {
@@ -27,12 +31,6 @@
   "scripts": {
     "test": "node --test",
     "smoke": "node scripts/smoke.mjs"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0"
-  },
-  "overrides": {
-    "@hono/node-server": "^2.0.11"
   },
   "engines": {
     "node": ">=20"
