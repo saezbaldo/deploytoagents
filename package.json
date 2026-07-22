@@ -7,7 +7,7 @@
   "homepage": "https://deploytoagents.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/saezbaldo/deploytoagents.git"
+    "url": "git+https://github.com/saezbaldo/deploytoagents.git"
   },
   "publishConfig": {
     "access": "public"
