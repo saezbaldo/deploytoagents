@@ -2,7 +2,7 @@
 
 Public JavaScript client and registry metadata for the [Deploy to Agents](https://deploytoagents.com) remote MCP server.
 
-The remote server is published in the official MCP Registry as `com.deploytoagents/server` and is served from `https://deploytoagents.com/mcp`. The JavaScript client and authenticated agent-first CLI are published as `deploytoagents@0.4.0` on npm, with an equivalent `deploytoagents==0.1.1` client on PyPI.
+The remote server is published in the official MCP Registry as `com.deploytoagents/server` and is served from `https://deploytoagents.com/mcp`. The JavaScript client and authenticated agent-first CLI are published as `deploytoagents@0.4.1` on npm, with an equivalent `deploytoagents==0.1.1` client on PyPI.
 
 ## Agent-first CLI
 

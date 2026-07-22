@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { DeployToAgentsClient } from "./index.js";
 
-const VERSION = "0.4.0";
+const VERSION = "0.4.1";
 const DEFAULT_API = "https://deploytoagents.com";
 const HELP = `Deploy to Agents CLI ${VERSION}
 

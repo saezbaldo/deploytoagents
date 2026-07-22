@@ -1,6 +1,6 @@
 {
   "name": "deploytoagents",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Agent-first CLI and JavaScript client for Deploy to Agents.",
   "type": "module",
   "license": "MIT",
