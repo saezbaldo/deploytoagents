@@ -2,7 +2,7 @@
 
 Public JavaScript client and registry metadata for the [Deploy to Agents](https://deploytoagents.com) remote MCP server.
 
-The remote server is published in the official MCP Registry as `com.deploytoagents/server` and is served from `https://deploytoagents.com/mcp`. The JavaScript client and authenticated agent-first CLI are published as `deploytoagents@0.3.0` on npm, with an equivalent `deploytoagents==0.1.1` client on PyPI.
+The remote server is published in the official MCP Registry as `com.deploytoagents/server` and is served from `https://deploytoagents.com/mcp`. The JavaScript client and authenticated agent-first CLI are published as `deploytoagents@0.4.0` on npm, with an equivalent `deploytoagents==0.1.1` client on PyPI.
 
 ## Agent-first CLI
 
@@ -10,10 +10,27 @@ The remote server is published in the official MCP Registry as `com.deploytoagen
 npx deploytoagents login
 npx deploytoagents whoami
 npx deploytoagents portfolio --json
+npx deploytoagents discovery --json
+npx deploytoagents discovery-record --input observation.json --json
 npx deploytoagents audit https://example.com --json
 ```
 
-The package installs both `deploytoagents` and the shorter `d2a` command. Google login uses Authorization Code with PKCE and a temporary loopback callback. On Windows the refresh credential is encrypted for the current OS user with DPAPI; CI can provide a short-lived identity token through `DEPLOYTOAGENTS_TOKEN`. All command results and errors have stable JSON forms for agent use.
+The package installs both `deploytoagents` and the shorter `d2a` command. Google login uses Authorization Code with PKCE and a temporary loopback callback. On Windows the refresh credential is encrypted for the current OS user with DPAPI; CI can provide a short-lived identity token through `DEPLOYTOAGENTS_TOKEN`. Discovery Lab can be read or supplied with a JSON observation file (or stdin via `--input -`). All command results and errors have stable JSON forms for agent use.
+
+```json
+{
+  "hostname": "example.com",
+  "surface": "claude",
+  "model": "model label shown by the surface",
+  "prompt": "Exact generic, unbranded prompt",
+  "outcome": "not-mentioned",
+  "freshSession": true,
+  "responseExcerpt": "Optional relevant excerpt",
+  "citations": ["https://example.org/source"]
+}
+```
+
+Valid outcomes are `recommended`, `mentioned`, `not-mentioned`, and `error`. The server verifies that the signed-in organization owns the target hostname.
 
 Deploy to Agents currently audits public agent-facing surfaces, returns unlisted evidence receipts, and creates prioritized technical and external-authority distribution plans. It does **not** yet claim to publish every customer artifact or guarantee recommendation by any model.
 

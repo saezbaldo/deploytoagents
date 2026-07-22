@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { DeployToAgentsClient } from "./index.js";
 
-const VERSION = "0.3.0";
+const VERSION = "0.4.0";
 const DEFAULT_API = "https://deploytoagents.com";
 const HELP = `Deploy to Agents CLI ${VERSION}
 
@@ -17,6 +17,8 @@ Usage:
   d2a login
   d2a whoami
   d2a portfolio
+  d2a discovery
+  d2a discovery-record --input <receipt.json|->
   d2a audit <public-url>
   d2a audit-status <audit-id>
   d2a plan <audit-id>
@@ -27,6 +29,7 @@ Usage:
 Options:
   --api <url>       API origin (default: https://deploytoagents.com)
   --endpoint <url>  MCP endpoint (default: https://deploytoagents.com/mcp)
+  --input <path|->  JSON input file, or - for stdin
   --json            Emit compact JSON
   --help            Show this help
   --version         Show the CLI version`;
@@ -48,7 +51,7 @@ function parseArgs(argv) {
     if (value === "--json") options.json = true;
     else if (value === "--help" || value === "-h") options.help = true;
     else if (value === "--version" || value === "-v") options.version = true;
-    else if (value === "--api" || value === "--endpoint") {
+    else if (value === "--api" || value === "--endpoint" || value === "--input") {
       const next = argv[++index];
       if (!next) throw new CliError("invalid_arguments", `${value} requires a URL.`, 2);
       options[value.slice(2)] = next;
@@ -127,7 +130,7 @@ async function fetchJson(url, init = {}) {
   const response = await fetch(url, { ...init, headers: { Accept: "application/json", ...init.headers } });
   const body = await response.json().catch(() => null);
   if (!response.ok) {
-    const message = body?.error_description ?? body?.error?.message ?? body?.title ?? `Request failed with HTTP ${response.status}.`;
+    const message = body?.error_description ?? body?.error?.message ?? body?.message ?? body?.title ?? `Request failed with HTTP ${response.status}.`;
     throw new CliError(response.status === 401 ? "not_authenticated" : "remote_error", message,
       response.status === 401 ? 3 : 1, response.status >= 500);
   }
@@ -220,6 +223,33 @@ async function portfolio(api) {
   return fetchJson(`${api}/api/dashboard/portfolio`, { headers: { Authorization: `Bearer ${credentials.idToken}` } });
 }
 
+async function discovery(api) {
+  const credentials = await refreshCredentials(await loadCredentials());
+  return fetchJson(`${api}/api/dashboard/discovery`, { headers: { Authorization: `Bearer ${credentials.idToken}` } });
+}
+
+async function readJsonInput(path) {
+  let content;
+  if (path === "-") {
+    const chunks = [];
+    for await (const chunk of process.stdin) chunks.push(chunk);
+    content = Buffer.concat(chunks).toString("utf8");
+  } else content = await readFile(path, "utf8");
+  try { return JSON.parse(content); }
+  catch { throw new CliError("invalid_input", "Discovery input must be valid JSON.", 2); }
+}
+
+async function recordDiscovery(api, inputPath) {
+  if (!inputPath) throw new CliError("invalid_arguments", "Usage: d2a discovery-record --input <receipt.json|->", 2);
+  const observation = await readJsonInput(inputPath);
+  const credentials = await refreshCredentials(await loadCredentials());
+  return fetchJson(`${api}/api/dashboard/discovery/observations`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${credentials.idToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify(observation),
+  });
+}
+
 async function withMcp(options, action) {
   const credentials = await refreshCredentials(await loadCredentials());
   const client = new DeployToAgentsClient({ endpoint: options.endpoint, token: credentials.idToken, clientVersion: VERSION });
@@ -235,6 +265,8 @@ async function execute(parsed) {
     case "logout": await deleteCredentials(); return { authenticated: false };
     case "whoami": return whoami(options.api);
     case "portfolio": return portfolio(options.api);
+    case "discovery": return discovery(options.api);
+    case "discovery-record": return recordDiscovery(options.api, options.input);
     case "capabilities": return withMcp(options, (client) => client.listTools());
     case "customer-zero": return withMcp(options, (client) => client.getCustomerZeroEvidence());
     case "audit":

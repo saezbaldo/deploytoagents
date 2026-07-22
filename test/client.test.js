@@ -31,6 +31,7 @@ test("publishes agent-first CLI executables", () => {
   const help = execFileSync(process.execPath, [cli, "--help"], { encoding: "utf8" });
   assert.match(help, /d2a login/);
   assert.match(help, /d2a portfolio/);
+  assert.match(help, /d2a discovery-record --input/);
   assert.match(help, /d2a audit <public-url>/);
   const version = execFileSync(process.execPath, [cli, "--version"], { encoding: "utf8" });
   assert.equal(version.trim(), manifest.version);

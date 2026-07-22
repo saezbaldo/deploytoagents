@@ -28,7 +28,7 @@ export class DeployToAgentsClient {
   #token;
   #clientInfo;
 
-  constructor({ endpoint = DEFAULT_ENDPOINT, clientName = "deploytoagents", clientVersion = "0.3.0", token } = {}) {
+  constructor({ endpoint = DEFAULT_ENDPOINT, clientName = "deploytoagents", clientVersion = "0.4.0", token } = {}) {
     const parsed = new URL(endpoint);
     if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1")
       throw new TypeError("The MCP endpoint must use HTTPS unless it is local development");
