@@ -1,6 +1,6 @@
 {
   "name": "deploytoagents-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Public JavaScript client for the Deploy to Agents remote MCP server.",
   "type": "module",
   "license": "MIT",
