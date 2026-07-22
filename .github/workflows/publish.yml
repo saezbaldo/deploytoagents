@@ -25,12 +25,14 @@ jobs:
       - id: release
         shell: bash
         run: |
-          if npm view "$npm_package_name@$npm_package_version" version >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
+          package_name=$(node -p "require('./package.json').name")
+          package_version=$(node -p "require('./package.json').version")
+          if npm view "$package_name@$package_version" version >/dev/null 2>&1; then
+            echo "npm_exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "npm_exists=false" >> "$GITHUB_OUTPUT"
           fi
-      - if: steps.release.outputs.exists == 'false'
+      - if: steps.release.outputs.npm_exists == 'false'
         run: npm publish
 
   pypi:
@@ -41,9 +43,22 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - run: python -m pip install build
-      - run: python -m build
+      - id: release
+        shell: bash
+        run: |
+          project_name=$(python -c "import tomllib; print(tomllib.load(open('python/pyproject.toml','rb'))['project']['name'])")
+          project_version=$(python -c "import tomllib; print(tomllib.load(open('python/pyproject.toml','rb'))['project']['version'])")
+          if curl --fail --silent "https://pypi.org/pypi/$project_name/$project_version/json" >/dev/null; then
+            echo "pypi_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pypi_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.release.outputs.pypi_exists == 'false'
+        run: python -m pip install build
+      - if: steps.release.outputs.pypi_exists == 'false'
+        run: python -m build
         working-directory: python
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      - if: steps.release.outputs.pypi_exists == 'false'
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: python/dist/
